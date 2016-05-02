@@ -1,0 +1,30 @@
+{
+  "name": "wizard-chess",
+  "version": "0.1.0",
+  "license": "MIT",
+  "description": "AI of International chess",
+  "homepage": "https://github.com/jysperm/WizardChess",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jysperm/WizardChess.git"
+  },
+  "contributors": [
+    {
+      "name": "jysperm",
+      "email": "jysperm@gmail.com",
+      "url": "https://jysperm.me"
+    }
+  ],
+  "scripts": {
+    "compile": "tsc && browserify ui/*.js -o public/bundled.js",
+    "prepublish": "npm run compile"
+  },
+  "devDependencies": {
+    "browserify": "13.0.0",
+    "lodash": "4.11.1",
+    "react": "15.0.2",
+    "react-dom": "15.0.2",
+    "typescript": "1.8.10"
+  }
+}

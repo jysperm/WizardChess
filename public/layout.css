@@ -1,0 +1,13 @@
+.board .row .column {
+  width: 100px;
+  height: 100px;
+  background-color: #ffce9e;
+}
+
+.board .row:nth-child(odd) .column:nth-child(even) {
+  background-color: #d18b47;
+}
+
+.board .row:nth-child(even) .column:nth-child(odd) {
+  background-color: #d18b47;
+}
