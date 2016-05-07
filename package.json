@@ -4,7 +4,6 @@
   "license": "MIT",
   "description": "AI of International chess",
   "homepage": "https://github.com/jysperm/WizardChess",
-  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/jysperm/WizardChess.git"
@@ -17,12 +16,15 @@
     }
   ],
   "scripts": {
-    "compile": "tsc && browserify ui/*.js -o public/bundled.js",
-    "prepublish": "npm run compile"
+    "compile": "tsc && browserify ui/*.js lib/*.js -o public/bundled.js",
+    "prepublish": "npm run compile",
+    "test": "npm run compile && mocha"
   },
   "devDependencies": {
     "browserify": "13.0.0",
     "lodash": "4.11.1",
+    "mocha": "2.4.5",
+    "power-assert": "^1.4.0",
     "react": "15.0.2",
     "react-dom": "15.0.2",
     "typescript": "1.8.10"
