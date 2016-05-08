@@ -13,6 +13,8 @@ export interface Chess {
   camp: Camp;
 }
 
+export type Position = number;
+
 export class Situation {
   private slots: Array<Chess>;
 
@@ -39,6 +41,10 @@ export class Situation {
 
   public getSlots() {
     return this.slots;
+  }
+
+  public getChess(position: Position): Chess {
+    return this.slots[position];
   }
 
   public toFenString(): string {
