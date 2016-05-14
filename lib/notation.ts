@@ -13,18 +13,25 @@ export interface Chess {
   camp: Camp;
 }
 
-export type Position = number;
+/* array of 64 items */
+export type Board<T> = Array<T>;
+/* from 0 to 63 */
+export type BoardIndex = number;
+/* from a8 to h1 */
+export type PositionName = string;
+/* from [0, 0] to [7, 7] */
+export type PositionPair = Array<number>;
 
 export class Situation {
-  private slots: Array<Chess>;
+  private slots: Board<Chess>;
 
-  constructor(slots) {
+  constructor(slots: Board<Chess>) {
     this.slots = slots;
   }
 
   public static fromFenString(fenString: string): Situation {
     var currentIndex = 0;
-    var slots: Array<Chess> = [];
+    var slots: Board<Chess> = [];
 
     _.forEach(fenString, char => {
       if (isNumberChar(char)) {
@@ -43,8 +50,20 @@ export class Situation {
     return this.slots;
   }
 
-  public getChess(position: Position): Chess {
-    return this.slots[position];
+  public getChess(position: PositionName): Chess {
+    return this.slots[positionNameToBoardIndex(position)];
+  }
+
+  public moveChess(from: PositionName, to: PositionName): Situation {
+    return new Situation(this.slots.map( (chess, index) => {
+      if (index == positionNameToBoardIndex(to)) {
+        return this.slots[positionNameToBoardIndex(from)];
+      } else if (index == positionNameToBoardIndex(from)) {
+        return null;
+      } else {
+        return chess;
+      }
+    }));
   }
 
   public toFenString(): string {
@@ -69,6 +88,11 @@ export class Situation {
       }, {fenString: '', gaps: 0}).fenString;
     }).join('/');
   }
+}
+
+export function positionNameToBoardIndex(position: PositionName): BoardIndex {
+  var columnIndex = position[0], rowIndex = position[1];
+  return (8 - parseInt(rowIndex)) * 8 + (columnIndex.charCodeAt(0) - 'a'.charCodeAt(0));
 }
 
 function fenCharToChess(char: string): Chess {

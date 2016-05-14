@@ -1,30 +1,24 @@
 import * as _ from 'lodash';
-import {Camp, Chess, ChessType, Position, Situation} from './notation';
+import {Board, BoardIndex, Camp, Chess, ChessType, PositionPair, Situation} from './notation';
 
-export type Moves = Array<boolean>;
+export type Moves = Board<boolean>;
 
 export interface ChessRules {
-  getMoves(Situation, Position): Moves;
+  getMoves(Situation, BoardIndex): Moves;
 }
 
 var KingRules: ChessRules = {
   getMoves: function(situation, position) {
-    var moves = emptyMoves();
-    var sourceChess = situation.getChess(position);
+    var source = situation.getSlots()[position];
 
-    [-9, -8, -7, -1, 1, 7, 8, 9].forEach( offset => {
-      var target = position + offset;
-
-      if (inBoard(target)) {
-        var targetChess = situation.getChess(target);
-
-        if (!targetChess || sourceChess.camp != targetChess.camp) {
-          moves[target] = true;
-        }
-      }
+    return createMoves(situation, (index, target) => {
+      return [
+        pair(-1, -1), pair(0, -1), pair(1, -1), pair(-1, 0),
+        pair(1, 0), pair(-1, 1), pair(0, 1), pair(1, 1)
+      ].some( validPair => {
+        return _.isEqual(validPair, relativePosition(position, index)) && (!target || source.camp != target.camp);
+      });
     });
-
-    return moves;
   }
 };
 
@@ -40,14 +34,14 @@ var QueenRules: ChessRules = {
 var RookRules: ChessRules = {
   getMoves: function(situation, position) {
     var moves = emptyMoves();
-    var sourceChess = situation.getChess(position);
+    var sourceChess = situation.getSlots()[position];
 
     [-8, -1, 1, 8].forEach( direction => {
       var distance = 1;
 
       do {
         var target = position + direction * distance;
-        var targetChess = situation.getChess(target);
+        var targetChess = situation.getSlots()[target];
 
         if (inBoard(target) && (inHorizontalLine(position, target) || inVerticalLine(position, target))) {
           if (!targetChess) {
@@ -71,14 +65,14 @@ var RookRules: ChessRules = {
 var BishopRules: ChessRules = {
   getMoves: function(situation, position) {
     var moves = emptyMoves();
-    var sourceChess = situation.getChess(position);
+    var sourceChess = situation.getSlots()[position];
 
     [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach( ([xDirection, yDirection]) => {
       var distance = 1;
 
       do {
         var target = position + (yDirection * distance * 8) + (xDirection * distance);
-        var targetChess = situation.getChess(target);
+        var targetChess = situation.getSlots()[target];
 
         if (inBoard(target) && inDiagonalLine(position, target)) {
           if (!targetChess) {
@@ -101,37 +95,30 @@ var BishopRules: ChessRules = {
 
 var KnightRules: ChessRules = {
   getMoves: function(situation, position) {
-    var moves = emptyMoves();
-    var sourceChess = situation.getChess(position);
+    var source = situation.getSlots()[position];
 
-    [-17, -15, -10, -6, 6, 10, 15, 17].forEach( offset => {
-      var target = position + offset;
-
-
-      if (inBoard(target)) {
-        var targetChess = situation.getChess(target);
-
-        if (!targetChess || sourceChess.camp != targetChess.camp) {
-          moves[target] = true;
-        }
-      }
+    return createMoves(situation, (index, target) => {
+      return [
+        pair(-1, -2), pair(1, -2), pair(-2, -1), pair(2, -1),
+        pair(-2, 1), pair(2, 1), pair(-1, 2), pair(1, 2)
+      ].some( validPair => {
+        return _.isEqual(validPair, relativePosition(position, index)) && (!target || source.camp != target.camp);
+      });
     });
-
-    return moves;
   }
 };
 
 var PawnRules: ChessRules = {
   getMoves: function(situation, position) {
     var moves = emptyMoves();
-    var sourceChess = situation.getChess(position);
+    var sourceChess = situation.getSlots()[position];
     var campOffset = sourceChess.camp == Camp.white ? -1 : 1;
     var initial = y(position) == (sourceChess.camp == Camp.white ? 6 : 1);
 
     var tryToMove = function(offset): boolean {
       var target = position + offset * campOffset;
 
-      if (inBoard(target) && !situation.getChess(target)) {
+      if (inBoard(target) && !situation.getSlots()[target]) {
         return moves[target] = true;
       }
     };
@@ -142,7 +129,7 @@ var PawnRules: ChessRules = {
 
     [7, 9].forEach( offset => {
       var target = position + offset * campOffset;
-      var targetChess = situation.getChess(target);
+      var targetChess = situation.getSlots()[target];
 
       if (inBoard(target) && targetChess && sourceChess.camp != targetChess.camp) {
         moves[target] = true;
@@ -168,36 +155,55 @@ export function of(chess: Chess): ChessRules {
 
 function emptyMoves(): Moves {
   return _.range(64).map( () => {
-    return null;
+    return false;
   });
 }
 
-function unionMoves(moves1, moves2) {
+function createMoves(situation: Situation, iterator: (BoardIndex, Chess) => boolean): Moves {
+  return emptyMoves().map( (move, index) => {
+    var target = situation.getSlots()[index];
+    return iterator(index, target);
+  });
+}
+
+function unionMoves(moves1: Moves, moves2: Moves) {
   return emptyMoves().map( (value, position) => {
     return moves1[position] || moves2[position];
   });
 }
 
-function inBoard(position: Position): boolean {
+function inBoard(position: BoardIndex): boolean {
   return position >= 0 && position <= 63;
 }
 
-function x(position: Position): number {
+function relativePosition(base: BoardIndex, target: BoardIndex): PositionPair {
+  return pair(x(target) - x(base), y(target) - y(base));
+}
+
+function pair(x: number, y: number): PositionPair {
+  return [x, y];
+}
+
+function pairToBoardIndex(pair: PositionPair): BoardIndex {
+  return pair[1] * 8 + pair[0];
+}
+
+function x(position: BoardIndex): number {
   return position % 8;
 }
 
-function y(position: Position): number {
+function y(position: BoardIndex): number {
   return Math.floor(position / 8);
 }
 
-function inHorizontalLine(position1: Position, position2: Position): boolean {
+function inHorizontalLine(position1: BoardIndex, position2: BoardIndex): boolean {
   return y(position1) == y(position2);
 }
 
-function inVerticalLine(position1: Position, position2: Position): boolean {
+function inVerticalLine(position1: BoardIndex, position2: BoardIndex): boolean {
   return x(position1) == x(position2);
 }
 
-function inDiagonalLine(position1: Position, position2: Position): boolean {
+function inDiagonalLine(position1: BoardIndex, position2: BoardIndex): boolean {
   return Math.abs(x(position1) - x(position2)) == Math.abs(y(position1) - y(position2));
 }
