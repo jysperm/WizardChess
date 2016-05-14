@@ -4,10 +4,40 @@
   background-color: #ffce9e;
 }
 
+.board .row .column.available {
+  background-color: cornsilk !important;
+}
+
 .board .row:nth-child(odd) .column:nth-child(even) {
   background-color: #d18b47;
 }
 
 .board .row:nth-child(even) .column:nth-child(odd) {
   background-color: #d18b47;
+}
+
+.column:hover, .selected {
+  color: cornsilk;
+  cursor: pointer;
+}
+
+.wizard-chess-app {
+  clear: both;
+}
+
+.chess {
+  font-size: 48px;
+}
+
+.board {
+  float: left;
+}
+
+.controller {
+  margin: 4px;
+  float: left;
+}
+
+#fenString {
+  width: 400px;
 }
