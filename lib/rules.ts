@@ -5,6 +5,7 @@ export type Moves = Board<boolean>;
 
 export interface ChessRules {
   getMoves(Situation, BoardIndex): Moves;
+  getScore(Situation, BoardIndex): number;
 }
 
 var KingRules: ChessRules = {
@@ -19,6 +20,9 @@ var KingRules: ChessRules = {
         return _.isEqual(validPair, relativePosition(position, index)) && (!target || source.camp != target.camp);
       });
     });
+  },
+  getScore: function(situation, position) {
+    return _.compact(KingRules.getMoves(situation, position)).length * 10;
   }
 };
 
@@ -28,6 +32,9 @@ var QueenRules: ChessRules = {
       RookRules.getMoves(situation, position),
       BishopRules.getMoves(situation, position)
     );
+  },
+  getScore: function(situation, position) {
+    return 1000 + _.compact(QueenRules.getMoves(situation, position)).length * 10;
   }
 };
 
@@ -59,6 +66,9 @@ var RookRules: ChessRules = {
     });
 
     return moves;
+  },
+  getScore: function(situation, position) {
+    return 500 + _.compact(RookRules.getMoves(situation, position)).length * 10;
   }
 };
 
@@ -90,6 +100,9 @@ var BishopRules: ChessRules = {
     });
 
     return moves;
+  },
+  getScore: function(situation, position) {
+    return 300 + _.compact(BishopRules.getMoves(situation, position)).length * 8;
   }
 }
 
@@ -105,6 +118,9 @@ var KnightRules: ChessRules = {
         return _.isEqual(validPair, relativePosition(position, index)) && (!target || source.camp != target.camp);
       });
     });
+  },
+  getScore: function(situation, position) {
+    return 400 + _.compact(KnightRules.getMoves(situation, position)).length * 15;
   }
 };
 
@@ -137,6 +153,10 @@ var PawnRules: ChessRules = {
     });
 
     return moves;
+  },
+  getScore: function(situation, position) {
+    var positionScore = (situation.getSlots()[position].camp == Camp.white ? 6 - y(position) : y(position) - 1) * 10;
+    return 100 + _.compact(PawnRules.getMoves(situation, position)).length * 10 + positionScore;
   }
 };
 
