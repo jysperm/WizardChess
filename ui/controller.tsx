@@ -3,12 +3,11 @@ import {Camp, Situation, boardIndexToPositionName} from '../lib/notation';
 import evaluate from '../lib/evaluate';
 import search, {MovesWithScore} from '../lib/search';
 import {chessToUnicode} from './helpers';
-import {createSyncWorker} from '../lib/workers';
-
-var worker = createSyncWorker();
+import {SearchWorker} from '../lib/workers';
 
 interface ControllerProperties {
   fenString: string;
+  worker: SearchWorker;
   onFenChanged(fenString: string);
 }
 
@@ -33,10 +32,14 @@ export default class Controller extends React.Component<ControllerProperties, Bo
     var whiteScore = evaluate(situation, Camp.white);
     var blackScore = evaluate(situation, Camp.black);
 
+    var inSearch = false;
+
     if (!this.state.searchStarted) {
+      inSearch = true
+
       setTimeout( () => {
-        worker.search(situation, Camp.white, null, this.onSearchFinished.bind(this, Camp.white));
-        worker.search(situation, Camp.black, null, this.onSearchFinished.bind(this, Camp.black));
+        this.props.worker.search(situation, Camp.black, null, this.onSearchFinished.bind(this, Camp.black));
+        this.props.worker.search(situation, Camp.white, null, this.onSearchFinished.bind(this, Camp.white));
         this.state.searchStarted = true;
       }, 0);
     }
@@ -50,7 +53,7 @@ export default class Controller extends React.Component<ControllerProperties, Bo
       <div className='black-moves'>
         <p>Black Score: {blackScore} ({compareScoreToDisplay(whiteScore, blackScore)}%) costs {this.state.blackCosts}ms</p>
         <ul>
-          {this.state.blackMoves.map( ({move, score}) => {
+          {inSearch || this.state.blackMoves.map( ({move, score}) => {
             return <li key={`${move.from}-${move.to}`}>
               <span>
                 {chessToUnicode(situation.getSlots()[move.from])} from {boardIndexToPositionName(move.from)} to {boardIndexToPositionName(move.to)} with score {score}({score - blackScore})
@@ -64,7 +67,7 @@ export default class Controller extends React.Component<ControllerProperties, Bo
       <div className='white-moves'>
         <p>White Score: {whiteScore} ({compareScoreToDisplay(blackScore, whiteScore)}%) costs {this.state.whiteCosts}ms</p>
         <ul>
-          {this.state.whiteMoves.map( ({move, score}) => {
+          {inSearch || this.state.whiteMoves.map( ({move, score}) => {
             return <li key={`${move.from}-${move.to}`}>
               <span>
                 {chessToUnicode(situation.getSlots()[move.from])} from {boardIndexToPositionName(move.from)} to {boardIndexToPositionName(move.to)} with score {score}({score - whiteScore})
