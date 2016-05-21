@@ -4,7 +4,7 @@
   "dependencies": {
     "lodash": "github:typed-typings/npm-lodash#7ccf9dc406a792d702067f4eab0fa8df4109fcaa"
   },
-  "ambientDependencies": {
+  "globalDependencies": {
     "mocha": "registry:dt/mocha#2.2.5+20160317120654",
     "react": "registry:dt/react#0.14.0+20160423065914",
     "react-dom": "registry:dt/react-dom#0.14.0+20160412154040"

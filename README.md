@@ -1,11 +1,16 @@
 # Wizard Chess
-AI of International chess, under development.
+AI of International chess, just for fun, currently under development.
+
+## Technology
+
+* TypeScript
+* React
+* Web Worker
 
 ## Getting started
 
 ```bash
 typings install
 npm install
-npm run compile
-http-server
+npm start
 ```
