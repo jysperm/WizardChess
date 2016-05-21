@@ -3,6 +3,7 @@ import * as _ from 'lodash';
 
 import {Camp, Chess, ChessType, BoardIndex, Situation, positionNameToBoardIndex, PositionName} from '../lib/notation';
 import * as rules from '../lib/rules';
+import {chessToUnicode} from './helpers';
 
 interface BoardProperties {
   fenString: string;
@@ -21,9 +22,9 @@ export default class Board extends React.Component<BoardProperties, BoardState> 
 
     return <table className='board'>
       <tbody>
-        {_.rangeRight(0, 8).map( (rowId) => {
+        {_.rangeRight(0, 8).map( rowId => {
           return <tr key={rowId} className='row'>
-            {_.range(0, 8).map( (columnId) => {
+            {_.range(0, 8).map( columnId => {
               var columnName = `${String.fromCharCode('a'.charCodeAt(0) + columnId)}${rowId + 1}`;
 
               var className = 'column';
@@ -39,7 +40,7 @@ export default class Board extends React.Component<BoardProperties, BoardState> 
               return <td key={columnName} className={className} onClick={this.onCellClicked.bind(this, columnName)}>
                 <span className='position'>{columnName}</span>
                 <span className='chess'>{chessToUnicode(situation.getChess(columnName))}</span>
-              </td>
+              </td>;
             })}
           </tr>;
         })}
@@ -81,29 +82,5 @@ export default class Board extends React.Component<BoardProperties, BoardState> 
     } else {
       return false;
     }
-  }
-}
-
-function chessToUnicode(chess: Chess): string {
-  if (!chess) {
-    return ''
-  } else if (chess.camp == Camp.white) {
-    return ({
-      [ChessType.king]: '\u2654',
-      [ChessType.queen]: '\u2655',
-      [ChessType.rook]: '\u2656',
-      [ChessType.bishop]: '\u2657',
-      [ChessType.knight]: '\u2658',
-      [ChessType.pawn]: '\u2659'
-    })[chess.type];
-  } else {
-    return ({
-      [ChessType.king]: '\u265A',
-      [ChessType.queen]: '\u265B',
-      [ChessType.rook]: '\u265C',
-      [ChessType.bishop]: '\u265D',
-      [ChessType.knight]: '\u265E',
-      [ChessType.pawn]: '\u265F'
-    })[chess.type];
   }
 }

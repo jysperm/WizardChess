@@ -38,6 +38,10 @@
   float: left;
 }
 
+.black-moves, .white-moves {
+  float: left;
+}
+
 #fenString {
   width: 400px;
 }

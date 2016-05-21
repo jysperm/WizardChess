@@ -24,7 +24,7 @@ class WizardChess extends React.Component<Object, AppState> {
 
   protected onBoardChessMoved(from: PositionName, to: PositionName) {
     this.setState({
-      fenString: Situation.fromFenString(this.state.fenString).moveChess(from, to).toFenString()
+      fenString: Situation.fromFenString(this.state.fenString).moveChessByName(from, to).toFenString()
     });
   }
 

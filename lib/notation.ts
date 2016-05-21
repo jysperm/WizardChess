@@ -54,11 +54,15 @@ export class Situation {
     return this.slots[positionNameToBoardIndex(position)];
   }
 
-  public moveChess(from: PositionName, to: PositionName): Situation {
+  public moveChessByName(from: PositionName, to: PositionName): Situation {
+    return this.moveChess(positionNameToBoardIndex(from), positionNameToBoardIndex(to));
+  }
+
+  public moveChess(from: BoardIndex, to: BoardIndex) {
     return new Situation(this.slots.map( (chess, index) => {
-      if (index == positionNameToBoardIndex(to)) {
-        return this.slots[positionNameToBoardIndex(from)];
-      } else if (index == positionNameToBoardIndex(from)) {
+      if (index == to) {
+        return this.slots[from];
+      } else if (index == from) {
         return null;
       } else {
         return chess;
@@ -93,6 +97,10 @@ export class Situation {
 export function positionNameToBoardIndex(position: PositionName): BoardIndex {
   var columnIndex = position[0], rowIndex = position[1];
   return (8 - parseInt(rowIndex)) * 8 + (columnIndex.charCodeAt(0) - 'a'.charCodeAt(0));
+}
+
+export function boardIndexToPositionName(index: BoardIndex): PositionName {
+  return `${String.fromCharCode('a'.charCodeAt(0) + (index % 8))}${8 - Math.floor(index / 8)}`;
 }
 
 function fenCharToChess(char: string): Chess {
