@@ -17,7 +17,7 @@
   ],
   "scripts": {
     "compile": "tsc && browserify ui/*.js lib/*.js -o public/bundled.js",
-    "prepublish": "npm run compile",
+    "prepublish": "typings install && npm run compile",
     "start": "http-server",
     "test": "npm run compile && mocha"
   },
@@ -28,7 +28,8 @@
     "power-assert": "^1.4.0",
     "react": "15.0.2",
     "react-dom": "15.0.2",
-    "typescript": "1.8.10"
+    "typescript": "1.8.10",
+    "typings": "^1.0.4"
   },
   "dependencies": {
     "http-server": "0.9.0"

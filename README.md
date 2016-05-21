@@ -1,6 +1,8 @@
 # Wizard Chess
 AI of International chess, just for fun, currently under development.
 
+[![Build Status](https://travis-ci.org/jysperm/WizardChess.svg?branch=master)](https://travis-ci.org/jysperm/WizardChess)
+
 ## Technology
 
 * TypeScript
@@ -10,7 +12,6 @@ AI of International chess, just for fun, currently under development.
 ## Getting started
 
 ```bash
-typings install
 npm install
 npm start
 ```
