@@ -147,7 +147,7 @@ var PawnRules: ChessRules = {
       var target = position + offset * campOffset;
       var targetChess = situation.getSlots()[target];
 
-      if (inBoard(target) && targetChess && sourceChess.camp != targetChess.camp) {
+      if (inBoard(target) && y(target) == y(position) + campOffset && targetChess && sourceChess.camp != targetChess.camp) {
         moves[target] = true;
       }
     });
