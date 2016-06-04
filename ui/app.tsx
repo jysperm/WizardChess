@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
 import {Situation, Chess, PositionName} from '../lib/notation';
-import {createBrowserWorker, createSyncWorker, SearchWorker} from '../lib/workers';
+import {createBrowserWorker, SearchWorker} from '../lib/workers';
 
 import Board from './board';
 import Controller from './controller';

@@ -5,7 +5,7 @@ import search, {MovesWithScore, SearchOptions} from './search';
 type WorkerCallback = (moves: MovesWithScore, costs: number) => void;
 
 export interface SearchWorker {
-  search(situation: Situation, camp: Camp, options: SearchOptions, callback: WorkerCallback);
+  search(situation: Situation, camp: Camp, options: SearchOptions, callback?: WorkerCallback);
 }
 
 export function createSyncWorker(): SearchWorker {
@@ -13,7 +13,10 @@ export function createSyncWorker(): SearchWorker {
     search: function(situation, camp, options, callback) {
       var started = Date.now();
       var moves = search(situation, camp, options);
-      return callback(moves, Date.now() - started);
+
+      if (callback) {
+        callback(moves, Date.now() - started);
+      }
     }
   };
 }
