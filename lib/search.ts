@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import {BoardIndex, Camp, Situation} from './notation';
+import {BoardIndex, Camp, Situation, anotherCamp} from './notation';
 import * as rules from './rules';
 import evaluate from './evaluate';
 
@@ -64,8 +64,4 @@ function getAllMoves(situation: Situation, camp: Camp): Move[] {
 
 function createMove(from: BoardIndex, to: BoardIndex): Move {
   return {from, to};
-}
-
-function anotherCamp(camp: Camp): Camp {
-  return camp == Camp.black ? Camp.white : Camp.black;
 }

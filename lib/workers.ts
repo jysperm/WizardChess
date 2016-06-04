@@ -11,7 +11,6 @@ export interface SearchWorker {
 export function createSyncWorker(): SearchWorker {
   return {
     search: function(situation, camp, options, callback) {
-      console.log('situation', situation)
       var started = Date.now();
       var moves = search(situation, camp, options);
       return callback(moves, Date.now() - started);

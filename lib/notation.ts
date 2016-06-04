@@ -103,6 +103,10 @@ export function boardIndexToPositionName(index: BoardIndex): PositionName {
   return `${String.fromCharCode('a'.charCodeAt(0) + (index % 8))}${8 - Math.floor(index / 8)}`;
 }
 
+export function anotherCamp(camp: Camp): Camp {
+  return camp == Camp.black ? Camp.white : Camp.black;
+}
+
 function fenCharToChess(char: string): Chess {
   const mapping = {
     'K': ChessType.king,
