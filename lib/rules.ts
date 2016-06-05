@@ -22,7 +22,7 @@ var KingRules: ChessRules = {
     });
   },
   getScore: function(situation, position) {
-    return _.compact(KingRules.getMoves(situation, position)).length * 10;
+    return _.compact(KingRules.getMoves(situation, position)).length * 2;
   }
 };
 
@@ -34,7 +34,7 @@ var QueenRules: ChessRules = {
     );
   },
   getScore: function(situation, position) {
-    return 1000 + _.compact(QueenRules.getMoves(situation, position)).length * 10;
+    return 1000 + _.compact(QueenRules.getMoves(situation, position)).length * 2;
   }
 };
 
@@ -68,7 +68,7 @@ var RookRules: ChessRules = {
     return moves;
   },
   getScore: function(situation, position) {
-    return 500 + _.compact(RookRules.getMoves(situation, position)).length * 10;
+    return 500 + _.compact(RookRules.getMoves(situation, position)).length * 2;
   }
 };
 
@@ -102,7 +102,7 @@ var BishopRules: ChessRules = {
     return moves;
   },
   getScore: function(situation, position) {
-    return 300 + _.compact(BishopRules.getMoves(situation, position)).length * 8;
+    return 300 + _.compact(BishopRules.getMoves(situation, position)).length * 2;
   }
 }
 
@@ -120,7 +120,7 @@ var KnightRules: ChessRules = {
     });
   },
   getScore: function(situation, position) {
-    return 400 + _.compact(KnightRules.getMoves(situation, position)).length * 15;
+    return 400 + _.compact(KnightRules.getMoves(situation, position)).length * 3;
   }
 };
 
@@ -155,8 +155,8 @@ var PawnRules: ChessRules = {
     return moves;
   },
   getScore: function(situation, position) {
-    var positionScore = (situation.getSlots()[position].camp == Camp.white ? 6 - y(position) : y(position) - 1) * 10;
-    return 100 + _.compact(PawnRules.getMoves(situation, position)).length * 10 + positionScore;
+    var positionScore = (situation.getSlots()[position].camp == Camp.white ? 6 - y(position) : y(position) - 1) * 2;
+    return 100 + _.compact(PawnRules.getMoves(situation, position)).length * 2 + positionScore;
   }
 };
 
