@@ -1,6 +1,6 @@
 import * as React from 'react';
-import {Camp, Situation, boardIndexToPositionName, anotherCamp} from '../lib/notation';
-import search, {MovesWithScore, Move, evaluate} from '../lib/search';
+import {Camp, Situation, boardIndexToPositionName, anotherCamp, Move} from '../lib/notation';
+import search, {MovesWithScore, evaluate} from '../lib/search';
 import {createBrowserWorker, SearchWorker} from '../lib/workers';
 import {chessToUnicode} from './helpers';
 

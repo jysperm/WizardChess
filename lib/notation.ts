@@ -13,6 +13,11 @@ export interface Chess {
   camp: Camp;
 }
 
+export interface Move {
+  from: BoardIndex;
+  to: BoardIndex;
+}
+
 /* array of 64 items */
 export type Board<T> = Array<T>;
 /* from 0 to 63 */

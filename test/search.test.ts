@@ -12,10 +12,10 @@ describe('evaluate', function() {
     });
 
     it('more complex cases', function() {
-      assert.equal(evaluate(Situation.fromFenString('r1bqkbnr/1ppp1ppp/p1B5/4p3/4P3/5N2/PPPP1PPP/RNBQK2R'), Camp.white), 404);
-      assert.equal(evaluate(Situation.fromFenString('r1bqkbnr/1ppp1ppp/p1B5/4p3/4P3/5N2/PPPP1PPP/RNBQK2R'), Camp.black), -404);
-      assert.equal(evaluate(Situation.fromFenString('5k2/ppp5/4P3/3R3p/6P1/1K2Nr2/PP3P2/8'), Camp.white), 534);
-      assert.equal(evaluate(Situation.fromFenString('5k2/ppp5/4P3/3R3p/6P1/1K2Nr2/PP3P2/8'), Camp.black), -534);
+      assert.equal(evaluate(Situation.fromFenString('r1bqkbnr/1ppp1ppp/p1B5/4p3/4P3/5N2/PPPP1PPP/RNBQK2R'), Camp.white), 402);
+      assert.equal(evaluate(Situation.fromFenString('r1bqkbnr/1ppp1ppp/p1B5/4p3/4P3/5N2/PPPP1PPP/RNBQK2R'), Camp.black), -402);
+      assert.equal(evaluate(Situation.fromFenString('5k2/ppp5/4P3/3R3p/6P1/1K2Nr2/PP3P2/8'), Camp.white), 520);
+      assert.equal(evaluate(Situation.fromFenString('5k2/ppp5/4P3/3R3p/6P1/1K2Nr2/PP3P2/8'), Camp.black), -520);
     });
   });
 });

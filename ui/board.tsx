@@ -73,9 +73,9 @@ export default class Board extends React.Component<BoardProperties, BoardState> 
       var selectedChess = situation.getChess(this.state.selected);
 
       if (selectedChess) {
-        return rules.of(selectedChess).getMoves(
+        return _.find(rules.generateMoves(
           situation, positionNameToBoardIndex(this.state.selected)
-        )[positionNameToBoardIndex(position)] != false;
+        ), {to: positionNameToBoardIndex(position)}) != undefined;
       } else {
         return false;
       }

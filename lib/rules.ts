@@ -1,176 +1,146 @@
 import * as _ from 'lodash';
-import {Board, BoardIndex, Camp, Chess, ChessType, PositionPair, Situation} from './notation';
+import {Board, BoardIndex, Camp, Chess, ChessType, PositionPair, Situation, Move} from './notation';
 
-export type Moves = Board<boolean>;
+type Moves = Board<boolean>;
 
-export interface ChessRules {
-  getMoves(Situation, BoardIndex): Moves;
-  getScore(Situation, BoardIndex): number;
+function generateMovesForKing(board: Situation, from: BoardIndex, camp: Camp) {
+  return createMoves(board, (target, piece) => {
+    return [
+      pair(-1, -1), pair(0, -1), pair(1, -1), pair(-1, 0),
+      pair(1, 0), pair(-1, 1), pair(0, 1), pair(1, 1)
+    ].some( validPair => {
+      return _.isEqual(validPair, relativePosition(from, target)) && (!piece || camp != piece.camp);
+    });
+  });
 }
 
-var KingRules: ChessRules = {
-  getMoves: function(situation, position) {
-    var source = situation.getSlots()[position];
+function generateMovesForQueue(board: Situation, from: BoardIndex, camp: Camp) {
+  return unionMoves(
+    generateMovesForRook(board, from, camp),
+    generateMovesForBishop(board, from, camp)
+  );
+}
 
-    return createMoves(situation, (index, target) => {
-      return [
-        pair(-1, -1), pair(0, -1), pair(1, -1), pair(-1, 0),
-        pair(1, 0), pair(-1, 1), pair(0, 1), pair(1, 1)
-      ].some( validPair => {
-        return _.isEqual(validPair, relativePosition(position, index)) && (!target || source.camp != target.camp);
-      });
-    });
-  },
-  getScore: function(situation, position) {
-    return _.compact(KingRules.getMoves(situation, position)).length * 2;
-  }
-};
+function generateMovesForRook(board: Situation, from: BoardIndex, camp: Camp) {
+  var moves = emptyMoves();
 
-var QueenRules: ChessRules = {
-  getMoves: function(situation, position) {
-    return unionMoves(
-      RookRules.getMoves(situation, position),
-      BishopRules.getMoves(situation, position)
-    );
-  },
-  getScore: function(situation, position) {
-    return 1000 + _.compact(QueenRules.getMoves(situation, position)).length * 2;
-  }
-};
+  [-8, -1, 1, 8].forEach( direction => {
+    var distance = 1;
 
-var RookRules: ChessRules = {
-  getMoves: function(situation, position) {
-    var moves = emptyMoves();
-    var sourceChess = situation.getSlots()[position];
+    do {
+      var target = from + direction * distance;
+      var targetChess = board.getSlots()[target];
 
-    [-8, -1, 1, 8].forEach( direction => {
-      var distance = 1;
-
-      do {
-        var target = position + direction * distance;
-        var targetChess = situation.getSlots()[target];
-
-        if (inBoard(target) && (inHorizontalLine(position, target) || inVerticalLine(position, target))) {
-          if (!targetChess) {
-            moves[target] = true;
-          } else if (sourceChess.camp != targetChess.camp) {
-            moves[target] = true;
-            break;
-          } else {
-            break;
-          }
+      if (inBoard(target) && (inHorizontalLine(from, target) || inVerticalLine(from, target))) {
+        if (!targetChess) {
+          moves[target] = true;
+        } else if (camp != targetChess.camp) {
+          moves[target] = true;
+          break;
         } else {
           break;
         }
-      } while(distance++);
-    });
-
-    return moves;
-  },
-  getScore: function(situation, position) {
-    return 500 + _.compact(RookRules.getMoves(situation, position)).length * 2;
-  }
-};
-
-var BishopRules: ChessRules = {
-  getMoves: function(situation, position) {
-    var moves = emptyMoves();
-    var sourceChess = situation.getSlots()[position];
-
-    [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach( ([xDirection, yDirection]) => {
-      var distance = 1;
-
-      do {
-        var target = position + (yDirection * distance * 8) + (xDirection * distance);
-        var targetChess = situation.getSlots()[target];
-
-        if (inBoard(target) && inDiagonalLine(position, target)) {
-          if (!targetChess) {
-            moves[target] = true;
-          } else if (sourceChess.camp != targetChess.camp) {
-            moves[target] = true;
-            break;
-          } else {
-            break;
-          }
-        } else {
-          break;
-        }
-      } while(distance++);
-    });
-
-    return moves;
-  },
-  getScore: function(situation, position) {
-    return 300 + _.compact(BishopRules.getMoves(situation, position)).length * 2;
-  }
-}
-
-var KnightRules: ChessRules = {
-  getMoves: function(situation, position) {
-    var source = situation.getSlots()[position];
-
-    return createMoves(situation, (index, target) => {
-      return [
-        pair(-1, -2), pair(1, -2), pair(-2, -1), pair(2, -1),
-        pair(-2, 1), pair(2, 1), pair(-1, 2), pair(1, 2)
-      ].some( validPair => {
-        return _.isEqual(validPair, relativePosition(position, index)) && (!target || source.camp != target.camp);
-      });
-    });
-  },
-  getScore: function(situation, position) {
-    return 400 + _.compact(KnightRules.getMoves(situation, position)).length * 3;
-  }
-};
-
-var PawnRules: ChessRules = {
-  getMoves: function(situation, position) {
-    var moves = emptyMoves();
-    var sourceChess = situation.getSlots()[position];
-    var campOffset = sourceChess.camp == Camp.white ? -1 : 1;
-    var initial = y(position) == (sourceChess.camp == Camp.white ? 6 : 1);
-
-    var tryToMove = function(offset): boolean {
-      var target = position + offset * campOffset;
-
-      if (inBoard(target) && !situation.getSlots()[target]) {
-        return moves[target] = true;
+      } else {
+        break;
       }
-    };
+    } while(distance++);
+  });
 
-    if (tryToMove(8) && initial) {
-      tryToMove(16);
+  return moves;
+}
+
+function generateMovesForBishop(board: Situation, from: BoardIndex, camp: Camp) {
+  var moves = emptyMoves();
+
+  [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach( ([xDirection, yDirection]) => {
+    var distance = 1;
+
+    do {
+      var target = from + (yDirection * distance * 8) + (xDirection * distance);
+      var targetChess = board.getSlots()[target];
+
+      if (inBoard(target) && inDiagonalLine(from, target)) {
+        if (!targetChess) {
+          moves[target] = true;
+        } else if (camp != targetChess.camp) {
+          moves[target] = true;
+          break;
+        } else {
+          break;
+        }
+      } else {
+        break;
+      }
+    } while(distance++);
+  });
+
+  return moves;
+}
+
+function generateMovesForKnight(board: Situation, from: BoardIndex, camp: Camp) {
+  return createMoves(board, (target, piece) => {
+    return [
+      pair(-1, -2), pair(1, -2), pair(-2, -1), pair(2, -1),
+      pair(-2, 1), pair(2, 1), pair(-1, 2), pair(1, 2)
+    ].some( validPair => {
+      return _.isEqual(validPair, relativePosition(from, target)) && (!piece || camp != piece.camp);
+    });
+  });
+}
+
+function generateMovesForPawn(board: Situation, from: BoardIndex, camp: Camp) {
+  var moves = emptyMoves();
+  var campOffset = camp == Camp.white ? -1 : 1;
+  var initial = y(from) == (camp == Camp.white ? 6 : 1);
+
+  var tryToMove = function(offset): boolean {
+    var target = from + offset * campOffset;
+
+    if (inBoard(target) && !board.getSlots()[target]) {
+      return moves[target] = true;
     }
+  };
 
-    [7, 9].forEach( offset => {
-      var target = position + offset * campOffset;
-      var targetChess = situation.getSlots()[target];
-
-      if (inBoard(target) && y(target) == y(position) + campOffset && targetChess && sourceChess.camp != targetChess.camp) {
-        moves[target] = true;
-      }
-    });
-
-    return moves;
-  },
-  getScore: function(situation, position) {
-    var positionScore = (situation.getSlots()[position].camp == Camp.white ? 6 - y(position) : y(position) - 1) * 2;
-    return 100 + _.compact(PawnRules.getMoves(situation, position)).length * 2 + positionScore;
+  if (tryToMove(8) && initial) {
+    tryToMove(16);
   }
-};
 
-export var rules = {
-  [ChessType.king]: KingRules,
-  [ChessType.queen]: QueenRules,
-  [ChessType.rook]: RookRules,
-  [ChessType.bishop]: BishopRules,
-  [ChessType.knight]: KnightRules,
-  [ChessType.pawn]: PawnRules
-};
+  [7, 9].forEach( offset => {
+    var target = from + offset * campOffset;
+    var piece = board.getSlots()[target];
 
-export function of(chess: Chess): ChessRules {
-  return rules[chess.type];
+    if (inBoard(target) && y(target) == y(from) + campOffset && piece && camp != piece.camp) {
+      moves[target] = true;
+    }
+  });
+
+  return moves;
+}
+
+export var moveGenerators = {
+  [ChessType.king]: generateMovesForKing,
+  [ChessType.queen]: generateMovesForQueue,
+  [ChessType.rook]: generateMovesForRook,
+  [ChessType.bishop]: generateMovesForBishop,
+  [ChessType.knight]: generateMovesForKnight,
+  [ChessType.pawn]: generateMovesForPawn
+}
+
+export function getAvailableMovesBoard(board: Situation, from: BoardIndex): Moves {
+  var piece = board.getSlots()[from];
+  return moveGenerators[piece.type](board, from, piece.camp)
+}
+
+export function generateMoves(board: Situation, from: BoardIndex): Array<Move> {
+  var piece = board.getSlots()[from];
+
+  return <Array<Move>> _.compact(moveGenerators[piece.type](board, from, piece.camp).map( (canMove, to) => {
+    if (canMove) {
+      return {from, to};
+    } else {
+      return null;
+    }
+  }));
 }
 
 function emptyMoves(): Moves {
