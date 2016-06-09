@@ -13,7 +13,7 @@ function run(fenStrings) {
 }
 
 describe('benchmark', function() {
-  this.timeout(60 * 1000);
+  this.timeout(600 * 1000);
 
   it('openings', function() {
     run([
