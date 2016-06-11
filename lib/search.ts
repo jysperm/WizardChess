@@ -19,7 +19,7 @@ export interface SearchOptions {
 
 const defaultOptions: SearchOptions = {
   algorithm: 'alphabeta',
-  depth: 3
+  depth: 4
 };
 
 export function evaluate(situation: Situation, camp: Camp): number {
@@ -77,29 +77,25 @@ function alphaBetaSearch(depth: number, situation: Situation, camp: Camp, curren
   } else {
     var moves = getAllMoves(situation, camp);
 
-    if (camp == currentCamp) {
-      for (let move of moves) {
+    for (let move of moves) {
+      if (camp == currentCamp) {
         alpha = Math.max(alpha,
           alphaBetaSearch(depth - 1, situation.moveChess(move.from, move.to), camp, anotherCamp(currentCamp), alpha, beta)
         );
-
-        if (beta <= alpha) {
-          break;
-        }
-      }
-
-      return alpha;
-    } else {
-      for (let move of moves) {
+      } else {
         beta = Math.min(beta,
           alphaBetaSearch(depth - 1, situation.moveChess(move.from, move.to), camp, anotherCamp(currentCamp), alpha, beta)
         );
-
-        if (beta <= alpha) {
-          break;
-        }
       }
 
+      if (beta <= alpha) {
+        break;
+      }
+    }
+
+    if (camp == currentCamp) {
+      return alpha;
+    } else {
       return beta;
     }
   }
