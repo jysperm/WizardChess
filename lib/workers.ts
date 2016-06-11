@@ -1,18 +1,18 @@
 import * as _ from 'lodash';
 import {Camp, Situation} from './notation';
-import search, {MovesWithScore, SearchOptions} from './search';
+import search, {MovesWithScore} from './search';
 
 type WorkerCallback = (moves: MovesWithScore, costs: number) => void;
 
 export interface SearchWorker {
-  search(situation: Situation, camp: Camp, options: SearchOptions, callback?: WorkerCallback);
+  search(situation: Situation, camp: Camp, callback?: WorkerCallback);
 }
 
 export function createSyncWorker(): SearchWorker {
   return {
-    search: function(situation, camp, options, callback) {
+    search: function(situation, camp, callback) {
       var started = Date.now();
-      var moves = search(situation, camp, options);
+      var moves = search(situation, camp);
 
       if (callback) {
         callback(moves, Date.now() - started);
@@ -32,10 +32,10 @@ export function createBrowserWorker(): SearchWorker {
   });
 
   return {
-    search: function(situation, camp, options, callback) {
+    search: function(situation, camp, callback) {
       var jobId = _.uniqueId('job');
       jobs[jobId] = callback;
-      worker.postMessage({jobId, situation, camp, options});
+      worker.postMessage({jobId, situation, camp,});
     }
   };
 }
@@ -43,7 +43,7 @@ export function createBrowserWorker(): SearchWorker {
 if (typeof document != 'object' && typeof postMessage == 'function') {
   self.addEventListener('message', function(event) {
     var started = Date.now();
-    var moves = search(new Situation(event.data.situation.slots), event.data.camp, event.data.options);
+    var moves = search(new Situation(event.data.situation.slots), event.data.camp);
 
     postMessage({
       jobId: event.data.jobId,

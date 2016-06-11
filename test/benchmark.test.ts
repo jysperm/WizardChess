@@ -1,6 +1,8 @@
 import {Camp, Situation} from '../lib/notation';
-import {MovesWithScore} from '../lib/search';
+import {MovesWithScore, searchOptions} from '../lib/search';
 import {createSyncWorker, SearchWorker} from '../lib/workers';
+
+searchOptions.depth = 3;
 
 var worker = createSyncWorker();
 

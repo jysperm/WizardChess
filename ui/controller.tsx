@@ -55,11 +55,11 @@ class MoveList extends React.Component<MoveListProperties, MoveListState> {
   }
 
   public componentDidMount() {
-    this.state.worker.search(this.props.situation, this.props.camp, null, this.onSearchFinished.bind(this));
+    this.state.worker.search(this.props.situation, this.props.camp, this.onSearchFinished.bind(this));
   }
 
   public componentWillReceiveProps(nextProps: MoveListProperties) {
-    this.state.worker.search(nextProps.situation, nextProps.camp, null, this.onSearchFinished.bind(this));
+    this.state.worker.search(nextProps.situation, nextProps.camp, this.onSearchFinished.bind(this));
   }
 
   public render() {

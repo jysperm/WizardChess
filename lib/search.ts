@@ -13,69 +13,70 @@ export interface Move {
 }
 
 export interface SearchOptions {
-  algorithm?: 'negamax' | 'alphabeta';
+  flexibility?: boolean;
   depth?: number;
 }
 
-const defaultOptions: SearchOptions = {
-  algorithm: 'alphabeta',
+export var searchOptions: SearchOptions = {
+  flexibility: false,
   depth: 4
 };
 
-export function evaluate(situation: Situation, camp: Camp): number {
-  var ourScore = 0;
-  var oppositeScore = 0;
+const scoreOfChess = {
+  [ChessType.king]: 10000,
+  [ChessType.queen]: 1000,
+  [ChessType.rook]: 500,
+  [ChessType.bishop]: 300,
+  [ChessType.knight]: 400,
+  [ChessType.pawn]: 100
+};
 
-  situation.getSlots().forEach( (chess, index) => {
+var metrics = resetMetrics();
+
+export function evaluate(situation: Situation, camp: Camp): number {
+  metrics.evaluate++;
+
+  return situation.getSlots().reduce( (sum, chess, index) => {
     if (chess) {
       if (chess.camp == camp) {
-        ourScore += rules.of(chess).getScore(situation, index);
+        if (searchOptions.flexibility) {
+          return sum + scoreOfChess[chess.type] + rules.of(chess).getMoves(situation, index).length;
+        } else {
+          return sum + scoreOfChess[chess.type];
+        }
       } else {
-        oppositeScore += rules.of(chess).getScore(situation, index);
+        if (searchOptions.flexibility) {
+          return sum - scoreOfChess[chess.type] - rules.of(chess).getMoves(situation, index).length;
+        } else {
+          return sum - scoreOfChess[chess.type];
+        }
       }
+    } else {
+      return sum;
+    }
+  }, 0);
+}
+
+export default function search(situation: Situation, camp: Camp): MovesWithScore {
+  var result = getAllMoves(situation, camp).map( move => {
+    return {
+      move: move,
+      score: alphaBetaSearch(searchOptions.depth -1, situation.moveChess(move.from, move.to), camp, camp, -Infinity, Infinity)
     }
   });
 
-  return ourScore - oppositeScore;
-}
-
-export default function search(situation: Situation, camp: Camp, options: SearchOptions = {}): MovesWithScore {
-  var {depth, algorithm} = <SearchOptions> _.defaults(options, defaultOptions);
-
-  if (algorithm == 'negamax') {
-    return getAllMoves(situation, camp).map( move => {
-      return {
-        move: move,
-        score: negaMaxSearch(depth - 1, situation.moveChess(move.from, move.to), camp)
-      };
-    });
-  } else if (algorithm == 'alphabeta') {
-    return getAllMoves(situation, camp).map( move => {
-      return {
-        move: move,
-        score: alphaBetaSearch(depth -1, situation.moveChess(move.from, move.to), camp, camp, -Infinity, Infinity)
-      }
-    });
-  } else {
-    return [];
-  }
-}
-
-function negaMaxSearch(depth: number, situation: Situation, camp: Camp): number {
-  if (depth <= 0) {
-    return evaluate(situation, camp);
-  } else {
-    return getAllMoves(situation, camp).reduce( (best, move) => {
-      return Math.max(best, -negaMaxSearch(depth - 1, situation.moveChess(move.from, move.to), anotherCamp(camp)));
-    }, -Infinity);
-  }
+  console.log(camp, metrics);
+  metrics = resetMetrics();
+  return result;
 }
 
 function alphaBetaSearch(depth: number, situation: Situation, camp: Camp, currentCamp: Camp, alpha: number, beta: number): number {
   if (depth <= 0) {
     return evaluate(situation, camp);
   } else {
-    var moves = getAllMoves(situation, camp);
+    metrics.search++;
+
+    var moves = getAllMoves(situation, camp)
 
     for (let move of moves) {
       if (camp == currentCamp) {
@@ -89,6 +90,7 @@ function alphaBetaSearch(depth: number, situation: Situation, camp: Camp, curren
       }
 
       if (beta <= alpha) {
+        metrics.cut++;
         break;
       }
     }
@@ -119,4 +121,12 @@ function getAllMoves(situation: Situation, camp: Camp): Move[] {
 
 function createMove(from: BoardIndex, to: BoardIndex): Move {
   return {from, to};
+}
+
+function resetMetrics() {
+  return {
+    search: 0,
+    evaluate: 0,
+    cut: 0
+  }
 }
