@@ -57,11 +57,13 @@ export function evaluate(situation: Situation, camp: Camp): number {
   }, 0);
 }
 
-export default function search(situation: Situation, camp: Camp): MovesWithScore {
+export default function search(situation: Situation, camp: Camp, depth?: number): MovesWithScore {
+  depth = depth || searchOptions.depth;
+
   var result = getAllMoves(situation, camp).map( move => {
     return {
       move: move,
-      score: alphaBetaSearch(searchOptions.depth -1, situation.moveChess(move.from, move.to), camp, camp, -Infinity, Infinity)
+      score: alphaBetaSearch(depth -1, situation.moveChess(move.from, move.to), camp, camp, -Infinity, Infinity)
     }
   });
 

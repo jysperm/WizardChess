@@ -1,7 +1,28 @@
 .board .row .column {
+  width: 35px;
+  height: 35px;
+  background-color: #ffce9e;
+}
+
+.board .chess {
+  font-size: 25px;
+}
+
+.board .position {
+  display: none;;
+}
+
+.board-big .row .column {
   width: 100px;
   height: 100px;
-  background-color: #ffce9e;
+}
+
+.board-big .position {
+  display: inline;
+}
+
+.board-big .chess {
+  font-size: 48px;
 }
 
 .board .row .column.available {
@@ -25,16 +46,30 @@
   clear: both;
 }
 
-.chess {
-  font-size: 48px;
+.board-big {
+  float: left;
+  margin-bottom: 25px;
 }
 
-.board {
-  float: left;
+.search-node ul {
+  list-style-type: none;
+}
+
+.current-move {
+  font-weight: bold;
 }
 
 .controller {
   margin: 4px;
+  float: left;
+}
+
+.inspector {
+  float: left;
+  clear: both;
+}
+
+.inspector .search-node {
   float: left;
 }
 

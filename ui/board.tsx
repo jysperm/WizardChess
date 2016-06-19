@@ -7,7 +7,7 @@ import {chessToUnicode} from './helpers';
 
 interface BoardProperties {
   fenString: string;
-  onChessMoved(from: PositionName, to: PositionName);
+  onChessMoved?(from: PositionName, to: PositionName);
 }
 
 interface BoardState {
@@ -19,25 +19,26 @@ export default class Board extends React.Component<BoardProperties, BoardState> 
 
   public render() {
     var situation = Situation.fromFenString(this.props.fenString);
+    var classNames = this.props.onChessMoved ? ['board', 'board-big'] : ['board'];
 
-    return <table className='board'>
+    return <table className={classNames.join(' ')}>
       <tbody>
         {_.rangeRight(0, 8).map( rowId => {
           return <tr key={rowId} className='row'>
             {_.range(0, 8).map( columnId => {
               var columnName = `${String.fromCharCode('a'.charCodeAt(0) + columnId)}${rowId + 1}`;
 
-              var className = 'column';
+              var classNames = ['column'];
 
               if (this.state.selected == columnName) {
-                className += ' selected';
+                classNames.push('selected');
               }
 
               if (this.ableToMove(columnName)) {
-                className += ' available'
+                classNames.push('available');
               }
 
-              return <td key={columnName} className={className} onClick={this.onCellClicked.bind(this, columnName)}>
+              return <td key={columnName} className={classNames.join(' ')} onClick={this.onCellClicked.bind(this, columnName)}>
                 <span className='position'>{columnName}</span>
                 <span className='chess'>{chessToUnicode(situation.getChess(columnName))}</span>
               </td>;
@@ -49,6 +50,10 @@ export default class Board extends React.Component<BoardProperties, BoardState> 
   }
 
   protected onCellClicked(position: PositionName) {
+    if (!this.props.onChessMoved) {
+      return;
+    }
+
     var situation = Situation.fromFenString(this.props.fenString);
 
     if (this.state.selected) {

@@ -7,6 +7,7 @@ import {chessToUnicode} from './helpers';
 interface ControllerProperties {
   fenString: string;
   onFenChanged(fenString: string);
+  onInspect(fenString: string, camp: Camp);
 }
 
 export default class Controller extends React.Component<ControllerProperties, Object> {
@@ -19,8 +20,13 @@ export default class Controller extends React.Component<ControllerProperties, Ob
         <textarea id='fenString' value={this.props.fenString} onChange={this.onFenChanged.bind(this)} />
       </div>
 
-      <MoveList situation={situation} camp={Camp.black} onPlayClicked={this.onPlayClicked.bind(this)} />
-      <MoveList situation={situation} camp={Camp.white} onPlayClicked={this.onPlayClicked.bind(this)} />
+      <MoveList situation={situation} camp={Camp.black} onPlayClicked={this.onPlayClicked.bind(this)}
+                onInspectClicked={this.onInspectClicked.bind(this, Camp.black)}
+      />
+
+      <MoveList situation={situation} camp={Camp.white} onPlayClicked={this.onPlayClicked.bind(this)}
+                onInspectClicked={this.onInspectClicked.bind(this, Camp.white)}
+      />
     </div>;
   }
 
@@ -31,12 +37,17 @@ export default class Controller extends React.Component<ControllerProperties, Ob
   protected onPlayClicked(move) {
     this.props.onFenChanged(Situation.fromFenString(this.props.fenString).moveChess(move.from, move.to).toFenString());
   }
+
+  protected onInspectClicked(camp: Camp, move: Move) {
+    this.props.onInspect(Situation.fromFenString(this.props.fenString).moveChess(move.from, move.to).toFenString(), anotherCamp(camp));
+  }
 }
 
 interface MoveListProperties {
   situation: Situation;
   camp: Camp;
   onPlayClicked(move: Move);
+  onInspectClicked(move: Move);
 }
 
 interface MoveListState {
@@ -55,15 +66,17 @@ class MoveList extends React.Component<MoveListProperties, MoveListState> {
   }
 
   public componentDidMount() {
-    this.state.worker.search(this.props.situation, this.props.camp, this.onSearchFinished.bind(this));
+    this.state.worker.search(this.props.situation, this.props.camp, null, this.onSearchFinished.bind(this));
   }
 
   public componentWillReceiveProps(nextProps: MoveListProperties) {
-    this.state.worker.search(nextProps.situation, nextProps.camp, this.onSearchFinished.bind(this));
+    if (this.props.situation.toFenString() != nextProps.situation.toFenString()) {
+      this.state.worker.search(nextProps.situation, nextProps.camp, null, this.onSearchFinished.bind(this));
+    }
   }
 
   public render() {
-    var {situation, camp, onPlayClicked} = this.props;
+    var {situation, camp, onPlayClicked, onInspectClicked} = this.props;
 
     var rootClassName = camp == Camp.black ? 'black-moves' : 'white-moves';
     var campName = camp == Camp.black ? 'Black' : 'White';
@@ -77,6 +90,7 @@ class MoveList extends React.Component<MoveListProperties, MoveListState> {
             <span>
               {chessToUnicode(situation.getSlots()[move.from])} from {boardIndexToPositionName(move.from)} to {boardIndexToPositionName(move.to)} with score {score}({score - ourScore})
             </span>
+            <button onClick={onInspectClicked.bind(this, move)}>Inspect</button>
             <button onClick={onPlayClicked.bind(null, move)}>Play</button>
           </li>;
         })}

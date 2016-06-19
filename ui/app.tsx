@@ -1,13 +1,16 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
-import {Situation, Chess, PositionName} from '../lib/notation';
+import {Situation, Camp, Chess, PositionName} from '../lib/notation';
 
 import Board from './board';
 import Controller from './controller';
+import Inspector from './inspector';
 
 interface AppState {
   fenString?: string;
+  inspectingFenString?: string;
+  inspectingCamp?: Camp;
 }
 
 class WizardChess extends React.Component<Object, AppState> {
@@ -18,7 +21,10 @@ class WizardChess extends React.Component<Object, AppState> {
   public render() {
     return <div className='wizard-chess-app'>
       <Board fenString={this.state.fenString} onChessMoved={this.onBoardChessMoved.bind(this)} />
-      <Controller fenString={this.state.fenString} onFenChanged={this.onControllerFenChanged.bind(this)} />
+      <Controller fenString={this.state.fenString} onFenChanged={this.onControllerFenChanged.bind(this)}
+                  onInspect={this.onControllerInspect.bind(this)}
+      />
+      <Inspector fenString={this.state.inspectingFenString} camp={this.state.inspectingCamp} />
     </div>;
   }
 
@@ -30,6 +36,13 @@ class WizardChess extends React.Component<Object, AppState> {
 
   protected onControllerFenChanged(fenString: string) {
     this.setState({fenString});
+  }
+
+  protected onControllerInspect(fenString: string, camp: Camp) {
+    this.setState({
+      inspectingFenString: fenString,
+      inspectingCamp: camp
+    });
   }
 }
 
