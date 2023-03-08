@@ -19,7 +19,8 @@
     "node_modules",
     "typings/browser",
     "typings/main",
-    "typings/main.d.ts"
+    "typings/main.d.ts",
+    ".heroku"
   ],
   "compileOnSave": true,
   "buildOnSave": false,
