@@ -18,7 +18,7 @@ export interface SearchOptions {
 }
 
 export var searchOptions: SearchOptions = {
-  flexibility: false,
+  flexibility: true,
   depth: 4
 };
 
@@ -63,7 +63,7 @@ export default function search(situation: Situation, camp: Camp, depth?: number)
   var result = getAllMoves(situation, camp).map( move => {
     return {
       move: move,
-      score: alphaBetaSearch(depth -1, situation.moveChess(move.from, move.to), camp, camp, -Infinity, Infinity)
+      score: alphaBetaSearch(depth - 1, situation.moveChess(move.from, move.to), camp, camp, -Infinity, Infinity)
     }
   });
 
