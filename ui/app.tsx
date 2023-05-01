@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
-import {Situation, Camp, Chess, PositionName} from '../lib/notation';
+import {Situation, Camp, PositionName} from '../lib/notation';
 
 import Board from './board';
 import Controller from './controller';

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as _ from 'lodash';
 
-import {Camp, Chess, ChessType, BoardIndex, Situation, positionNameToBoardIndex, PositionName} from '../lib/notation';
+import {Situation, positionNameToBoardIndex, PositionName} from '../lib/notation';
 import * as rules from '../lib/rules';
 import {chessToUnicode} from './helpers';
 
