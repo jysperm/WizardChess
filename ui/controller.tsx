@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {Camp, Situation, boardIndexToPositionName, anotherCamp} from '../lib/notation';
-import search, {MovesWithScore, Move, evaluate} from '../lib/search';
+import {MovesWithScore, Move, evaluate, searchOptions} from '../lib/search';
 import {createBrowserWorker, SearchWorker} from '../lib/workers';
 import {chessToUnicode} from './helpers';
 
@@ -15,18 +15,25 @@ export default class Controller extends React.Component<ControllerProperties, Ob
     var situation = Situation.fromFenString(this.props.fenString);
 
     return <div className='controller'>
-      <div>
-        <label htmlFor='fenString' />
+      <div className='input-and-instructions'>
         <textarea id='fenString' value={this.props.fenString} onChange={this.onFenChanged.bind(this)} />
+        <p>
+          You can manliple chess directly on the big board (whatever black or white), or modify the <a target='_blank' href='https://en.wikipedia.org/wiki/Forsyth–Edwards_Notation'>FEN</a> representation above, the following are moves calculated by Wizard Chess (sorted by score).
+          You can click on play button to apply one of them; or click on inspect button to exploer a particle path of derivations without applying this move.
+        </p>
+        <p>
+          Search depth: {searchOptions.depth}.
+        </p>
       </div>
+      <div className='row'>
+        <MoveList situation={situation} camp={Camp.black} onPlayClicked={this.onPlayClicked.bind(this)}
+                  onInspectClicked={this.onInspectClicked.bind(this, Camp.black)}
+        />
 
-      <MoveList situation={situation} camp={Camp.black} onPlayClicked={this.onPlayClicked.bind(this)}
-                onInspectClicked={this.onInspectClicked.bind(this, Camp.black)}
-      />
-
-      <MoveList situation={situation} camp={Camp.white} onPlayClicked={this.onPlayClicked.bind(this)}
-                onInspectClicked={this.onInspectClicked.bind(this, Camp.white)}
-      />
+        <MoveList situation={situation} camp={Camp.white} onPlayClicked={this.onPlayClicked.bind(this)}
+                  onInspectClicked={this.onInspectClicked.bind(this, Camp.white)}
+        />
+      </div>
     </div>;
   }
 

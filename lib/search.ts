@@ -19,7 +19,7 @@ export interface SearchOptions {
 
 export var searchOptions: SearchOptions = {
   flexibility: true,
-  depth: 4
+  depth: 5
 };
 
 const scoreOfChess = {

@@ -1,3 +1,18 @@
+.row {
+  display: flex;
+}
+
+.board-big {
+  margin-bottom: 25px;
+}
+
+.controller {
+  margin: 4px;
+}
+
+.inspector {
+}
+
 .board .row .column {
   width: 35px;
   height: 35px;
@@ -9,7 +24,7 @@
 }
 
 .board .position {
-  display: none;;
+  display: none;
 }
 
 .board-big .row .column {
@@ -42,15 +57,6 @@
   cursor: pointer;
 }
 
-.wizard-chess-app {
-  clear: both;
-}
-
-.board-big {
-  float: left;
-  margin-bottom: 25px;
-}
-
 .search-node ul {
   list-style-type: none;
 }
@@ -59,24 +65,18 @@
   font-weight: bold;
 }
 
-.controller {
-  margin: 4px;
-  float: left;
-}
-
-.inspector {
-  float: left;
-  clear: both;
-}
-
 .inspector .search-node {
-  float: left;
+
 }
 
 .black-moves, .white-moves {
-  float: left;
+
 }
 
 #fenString {
-  width: 400px;
+  width: 100%;
+}
+
+.input-and-instructions {
+  max-width: 800px;
 }

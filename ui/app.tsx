@@ -20,11 +20,15 @@ class WizardChess extends React.Component<Object, AppState> {
 
   public render() {
     return <div className='wizard-chess-app'>
-      <Board fenString={this.state.fenString} onChessMoved={this.onBoardChessMoved.bind(this)} />
-      <Controller fenString={this.state.fenString} onFenChanged={this.onControllerFenChanged.bind(this)}
-                  onInspect={this.onControllerInspect.bind(this)}
-      />
-      <Inspector fenString={this.state.inspectingFenString} camp={this.state.inspectingCamp} />
+      <div className='row'>
+        <Board fenString={this.state.fenString} onChessMoved={this.onBoardChessMoved.bind(this)} />
+        <Controller fenString={this.state.fenString} onFenChanged={this.onControllerFenChanged.bind(this)}
+                    onInspect={this.onControllerInspect.bind(this)}
+        />
+      </div>
+      <div className='row'>
+        <Inspector fenString={this.state.inspectingFenString} camp={this.state.inspectingCamp} />
+      </div>
     </div>;
   }
 
