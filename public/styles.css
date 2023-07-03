@@ -3,14 +3,18 @@
 }
 
 .board-big {
+  float: left;
   margin-bottom: 25px;
 }
 
 .controller {
+  float: left;
   margin: 4px;
 }
 
 .inspector {
+  clear: both;
+  float: left;
 }
 
 .board .row .column {
