@@ -70,7 +70,7 @@
 }
 
 .black-moves, .white-moves {
-
+  min-width: 20em;
 }
 
 #fenString {

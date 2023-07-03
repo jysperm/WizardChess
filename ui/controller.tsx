@@ -60,6 +60,7 @@ interface MoveListProperties {
 interface MoveListState {
   worker?: SearchWorker;
   moves?: MovesWithScore;
+  calculating?: boolean
   searchCosts?: number;
 }
 
@@ -68,6 +69,7 @@ class MoveList extends React.Component<MoveListProperties, MoveListState> {
     super(props)
     this.state = {
       moves: [],
+      calculating: true,
       worker: createBrowserWorker()
     }
   }
@@ -78,6 +80,7 @@ class MoveList extends React.Component<MoveListProperties, MoveListState> {
 
   public componentWillReceiveProps(nextProps: MoveListProperties) {
     if (this.props.situation.toFenString() != nextProps.situation.toFenString()) {
+      this.setState({calculating: true})
       this.state.worker.search(nextProps.situation, nextProps.camp, null, this.onSearchFinished.bind(this));
     }
   }
@@ -91,7 +94,7 @@ class MoveList extends React.Component<MoveListProperties, MoveListState> {
 
     return <div className={rootClassName}>
       <p>{campName} Score: {ourScore} costs {this.state.searchCosts}ms</p>
-      <ul>
+      {this.state.calculating ? <p>Calculating ...</p> : <ul>
         {this.state.moves.map( ({move, score}) => {
           return <li key={`${move.from}-${move.to}`}>
             <span>
@@ -101,13 +104,14 @@ class MoveList extends React.Component<MoveListProperties, MoveListState> {
             <button onClick={onPlayClicked.bind(null, move)}>Play</button>
           </li>;
         })}
-      </ul>
+      </ul>}
     </div>;
   }
 
   protected onSearchFinished(moves: MovesWithScore, costs: number) {
     this.setState({
       moves: moves.sort(sortMovesWithScore),
+      calculating: false,
       searchCosts: costs
     });
   }
