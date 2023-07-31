@@ -10,7 +10,18 @@ interface ControllerProperties {
   onInspect(fenString: string, camp: Camp);
 }
 
-export default class Controller extends React.Component<ControllerProperties, Object> {
+interface ControllerState {
+  searchDepth: number;
+}
+
+export default class Controller extends React.Component<ControllerProperties, ControllerState> {
+  constructor(props) {
+    super(props);
+    this.state = {
+      searchDepth: searchOptions.depth
+    };
+  }
+
   public render() {
     var situation = Situation.fromFenString(this.props.fenString);
 
@@ -22,15 +33,15 @@ export default class Controller extends React.Component<ControllerProperties, Ob
           You can click on play button to apply one of them; or click on inspect button to exploer a particle path of derivations without applying this move.
         </p>
         <p>
-          Search depth: {searchOptions.depth}.
+          Search depth: <input id='search-depth' type='number' value={this.state.searchDepth.toString()} onChange={this.onDepthChanged.bind(this)} min='1' max='10' />
         </p>
       </div>
       <div className='row'>
-        <MoveList situation={situation} camp={Camp.black} onPlayClicked={this.onPlayClicked.bind(this)}
+        <MoveList situation={situation} searchDepth={this.state.searchDepth} camp={Camp.black} onPlayClicked={this.onPlayClicked.bind(this)}
                   onInspectClicked={this.onInspectClicked.bind(this, Camp.black)}
         />
 
-        <MoveList situation={situation} camp={Camp.white} onPlayClicked={this.onPlayClicked.bind(this)}
+        <MoveList situation={situation} searchDepth={this.state.searchDepth} camp={Camp.white} onPlayClicked={this.onPlayClicked.bind(this)}
                   onInspectClicked={this.onInspectClicked.bind(this, Camp.white)}
         />
       </div>
@@ -45,6 +56,10 @@ export default class Controller extends React.Component<ControllerProperties, Ob
     this.props.onFenChanged(Situation.fromFenString(this.props.fenString).moveChess(move.from, move.to).toFenString());
   }
 
+  protected onDepthChanged(event) {
+    this.setState({searchDepth: event.target.value});
+  }
+
   protected onInspectClicked(camp: Camp, move: Move) {
     this.props.onInspect(Situation.fromFenString(this.props.fenString).moveChess(move.from, move.to).toFenString(), anotherCamp(camp));
   }
@@ -52,6 +67,7 @@ export default class Controller extends React.Component<ControllerProperties, Ob
 
 interface MoveListProperties {
   situation: Situation;
+  searchDepth: number;
   camp: Camp;
   onPlayClicked(move: Move);
   onInspectClicked(move: Move);
@@ -79,9 +95,9 @@ class MoveList extends React.Component<MoveListProperties, MoveListState> {
   }
 
   public componentWillReceiveProps(nextProps: MoveListProperties) {
-    if (this.props.situation.toFenString() != nextProps.situation.toFenString()) {
+    if (this.props.situation.toFenString() !== nextProps.situation.toFenString() || this.props.searchDepth !== nextProps.searchDepth) {
       this.setState({calculating: true})
-      this.state.worker.search(nextProps.situation, nextProps.camp, null, this.onSearchFinished.bind(this));
+      this.state.worker.search(nextProps.situation, nextProps.camp, nextProps.searchDepth, this.onSearchFinished.bind(this));
     }
   }
 
@@ -93,7 +109,8 @@ class MoveList extends React.Component<MoveListProperties, MoveListState> {
     var ourScore = evaluate(situation, camp);
 
     return <div className={rootClassName}>
-      <p>{campName} Score: {ourScore} costs {this.state.searchCosts}ms</p>
+      <h2>{campName}</h2>
+      <p>Score: {ourScore} costs {this.state.searchCosts}ms</p>
       {this.state.calculating ? <p>Calculating ...</p> : <ul>
         {this.state.moves.map( ({move, score}) => {
           return <li key={`${move.from}-${move.to}`}>
