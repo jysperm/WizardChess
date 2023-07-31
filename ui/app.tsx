@@ -18,6 +18,15 @@ class WizardChess extends React.Component<Object, AppState> {
     fenString: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'
   };
 
+  public componentDidMount() {
+    const searchParams = new (window as any).URLSearchParams(window.location.search);
+    const fenString = searchParams.get('fen')
+
+    if (fenString) {
+      this.setState({fenString})
+    }
+  }
+
   public render() {
     return <div className='wizard-chess-app'>
       <Board fenString={this.state.fenString} onChessMoved={this.onBoardChessMoved.bind(this)} />
@@ -35,6 +44,7 @@ class WizardChess extends React.Component<Object, AppState> {
   }
 
   protected onControllerFenChanged(fenString: string) {
+    window.history.pushState(null, null, `/?fen=${fenString}`);
     this.setState({fenString});
   }
 
