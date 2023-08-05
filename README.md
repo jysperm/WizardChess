@@ -7,6 +7,8 @@ Try online: <https://wizard-chess.herokuapp.com>
 
 Related blog in Chinese: [WizardChess: 一个国际象棋 AI 的实现](https://jysperm.me/2016/06/wizard-chess/)
 
+![Screenshot](https://user-images.githubusercontent.com/1191561/258572867-ec4ed43b-c27b-492f-a24b-1cab1f5f6cac.png)
+
 ## Development
 
 ```bash
