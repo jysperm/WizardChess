@@ -111,17 +111,25 @@ class MoveList extends React.Component<MoveListProperties, MoveListState> {
     return <div className={rootClassName}>
       <h2>{campName}</h2>
       <p>Score: {ourScore} costs {this.state.searchCosts}ms</p>
-      {this.state.calculating ? <p>Calculating ...</p> : <ul>
-        {this.state.moves.map( ({move, score}) => {
-          return <li key={`${move.from}-${move.to}`}>
-            <span>
-              {chessToUnicode(situation.getSlots()[move.from])} from {boardIndexToPositionName(move.from)} to {boardIndexToPositionName(move.to)} with score {score}({score - ourScore})
-            </span>
-            <button onClick={onInspectClicked.bind(this, move)}>Inspect</button>
-            <button onClick={onPlayClicked.bind(null, move)}>Play</button>
-          </li>;
-        })}
-      </ul>}
+      {(() => {
+        if (this.state.calculating) {
+          return <p>Calculating ...</p>;
+        } else if (this.state.moves.length === 0) {
+          return <p>Initializing ...</p>;
+        } else {
+          return <ul>
+          {this.state.moves.map( ({move, score}) => {
+            return <li key={`${move.from}-${move.to}`}>
+              <span>
+                {chessToUnicode(situation.getSlots()[move.from])} from {boardIndexToPositionName(move.from)} to {boardIndexToPositionName(move.to)} with score {score}({score - ourScore})
+              </span>
+              <button onClick={onInspectClicked.bind(this, move)}>Inspect</button>
+              <button onClick={onPlayClicked.bind(null, move)}>Play</button>
+            </li>;
+          })}
+        </ul>;
+        }
+      })()}
     </div>;
   }
 

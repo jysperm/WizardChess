@@ -14,13 +14,11 @@ interface AppState {
 }
 
 class WizardChess extends React.Component<Object, AppState> {
-  state: AppState = {
-    fenString: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'
-  };
+  state: AppState = {};
 
   public componentDidMount() {
     const searchParams = new (window as any).URLSearchParams(window.location.search);
-    const fenString = searchParams.get('fen')
+    const fenString = searchParams.get('fen') || 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'
 
     if (fenString) {
       this.setState({fenString})

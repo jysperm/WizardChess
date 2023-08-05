@@ -64,6 +64,7 @@ export default class Inspector extends React.Component<InspectorProperties, Insp
     }
 
     return <div className='inspector'>
+      <h1>Inspector</h1>
       {this.state.nodes.map( ({fenString, camp, depth, move}) => {
         return <SearchNode key={`${depth}-${fenString}`} depth={depth} camp={camp} fenString={fenString}
                     onInspectClicked={this.onInspectClicked.bind(this, depth, camp)} move={move}
@@ -136,9 +137,11 @@ class SearchNode extends React.Component<SearchNodeProperties, SearchNodeState> 
   public render() {
     var situation = Situation.fromFenString(this.props.fenString);
     var ourScore = evaluate(situation, this.props.camp);
+    var campName = this.props.camp == Camp.black ? 'Black' : 'White';
     var currentMove = this.props.move || (_.first(this.state.moves) && _.first(this.state.moves).move);
 
     return <div className='search-node'>
+      <h3>{campName}</h3>
       <Board fenString={this.props.fenString} />
       <ul>
         {this.state.moves.map( ({move, score}) => {
